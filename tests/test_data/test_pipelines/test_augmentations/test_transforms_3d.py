@@ -583,9 +583,9 @@ def test_random_jitter_points():
 
     input_dict = random_jitter_points(input_dict)
     trans_depth_points = input_dict['points']
-    assert (trans_depth_points.tensor - depth_points.tensor).max().item() <= \
+    assert (trans_depth_points.tensor - depth_points.tensor).max().detach() <= \
         0.05 + 1e-6
-    assert (trans_depth_points.tensor - depth_points.tensor).min().item() >= \
+    assert (trans_depth_points.tensor - depth_points.tensor).min().detach() >= \
         -0.05 - 1e-6
 
 

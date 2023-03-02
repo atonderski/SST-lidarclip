@@ -115,7 +115,7 @@ class SSTv2(nn.Module):
         assert voxel_info['voxel_coors'].dtype == torch.int64, 'data type of coors should be torch.int64!'
 
         device = voxel_info['voxel_coors'].device
-        batch_size = voxel_info['voxel_coors'][:, 0].max().item() + 1
+        batch_size = voxel_info['voxel_coors'][:, 0].max().detach() + 1
         voxel_feat = voxel_info['voxel_feats']
         ind_dict_list = [voxel_info[f'flat2win_inds_shift{i}'] for i in range(num_shifts)]
         padding_mask_list = [voxel_info[f'key_mask_shift{i}'] for i in range(num_shifts)]

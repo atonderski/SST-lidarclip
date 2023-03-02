@@ -125,7 +125,7 @@ class SSTv1(nn.Module):
         assert voxel_info['coors'].dtype == torch.int64, 'data type of coors should be torch.int64!'
         self.set_drop_info()
         device = voxel_info['coors'].device
-        batch_size = voxel_info['coors'][:, 0].max().item() + 1
+        batch_size = voxel_info['coors'][:, 0].max().detach() + 1
 
         num_shifts = len(ind_dict_list) # Usually num_shifts == 2, one for non-shifted layout, one for shifted layout
         
@@ -165,7 +165,7 @@ class SSTv1(nn.Module):
     
     def get_key_padding_mask(self, ind_dict, voxel_drop_lvl, device):
         num_all_voxel = len(voxel_drop_lvl)
-        key_padding = torch.ones((num_all_voxel, 1)).to(device).bool()
+        key_padding = torch.ones((num_all_voxel, 1), device=device, dtype=torch.bool)
 
         window_key_padding_dict = flat2window(key_padding, voxel_drop_lvl, ind_dict, self.drop_info)
 

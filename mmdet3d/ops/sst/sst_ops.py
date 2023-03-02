@@ -53,7 +53,7 @@ def get_flat2win_inds(batch_win_inds, voxel_drop_lvl, drop_info, debug=True):
         if debug:
             assert inner_win_inds.max() < max_tokens, f'Max inner inds({inner_win_inds.max()}) larger(equal) than {max_tokens}'
             assert (flat2window_inds >= 0).all()
-            max_ind = flat2window_inds.max().item()
+            max_ind = flat2window_inds.max().detach()
             assert  max_ind < num_windows * max_tokens, f'max_ind({max_ind}) larger than upper bound({num_windows * max_tokens})'
             assert  max_ind >= (num_windows-1) * max_tokens, f'max_ind({max_ind}) less than lower bound({(num_windows-1) * max_tokens})'
 
@@ -88,7 +88,7 @@ def flat2window(feat, voxel_drop_lvl, flat2win_inds_dict, drop_info):
         this_inds = flat2win_inds_dict[dl][0]
 
         max_tokens = drop_info[dl]['max_tokens']
-        num_windows = (this_inds // max_tokens).max().item() + 1
+        num_windows = (this_inds // max_tokens).max().detach() + 1
         feat_3d = torch.zeros((num_windows * max_tokens, feat_dim), dtype=dtype, device=device)
         if this_inds.max() >= num_windows * max_tokens:
             set_trace()
@@ -185,7 +185,7 @@ def get_inner_win_inds(win_inds):
     assert (num_tokens_each_win > 0).all()
     random_win = unique_sort_inds[random.randint(0, len(unique_sort_inds)-1)]
     random_mask = win_inds == random_win
-    num_voxel_this_win = bincount[random_win].item()
+    num_voxel_this_win = bincount[random_win].detach()
     random_inner_inds = inner_inds_reorder[random_mask] 
 
     assert len(torch.unique(random_inner_inds)) == num_voxel_this_win
@@ -253,7 +253,7 @@ def make_continuous_inds(inds):
 
     unique_inds, _ = torch.sort(torch.unique(inds))
     num_valid_inds = len(unique_inds)
-    max_origin_inds = unique_inds.max().item()
+    max_origin_inds = unique_inds.max().detach()
     canvas = -torch.ones((max_origin_inds+1,), dtype=dtype, device=device)
     canvas[unique_inds] = torch.arange(num_valid_inds, dtype=dtype, device=device)
 
@@ -503,7 +503,7 @@ class SRATensor(object):
 
             assert inner_win_inds.max() < max_tokens, f'Max inner inds({inner_win_inds.max()}) larger(equal) than {max_tokens}'
             assert (flat2window_inds >= 0).all()
-            max_ind = flat2window_inds.max().item()
+            max_ind = flat2window_inds.max().detach()
             assert  max_ind < num_windows * max_tokens, f'max_ind({max_ind}) larger than upper bound({num_windows * max_tokens})'
             assert  max_ind >= (num_windows-1) * max_tokens, f'max_ind({max_ind}) less than lower bound({(num_windows-1) * max_tokens})'
 
@@ -649,7 +649,7 @@ class SRATensor(object):
     def get_key_padding_mask(self, transform_info, voxel_drop_level, batching_info, device):
 
         num_all_voxel = len(voxel_drop_level)
-        key_padding = torch.ones((num_all_voxel, 1)).to(device).bool()
+        key_padding = torch.ones((num_all_voxel, 1), device=device, dtype=torch.bool)
 
         window_key_padding_dict = flat2window(key_padding, voxel_drop_level, transform_info, batching_info)
 

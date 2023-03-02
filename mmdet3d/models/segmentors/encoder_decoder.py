@@ -259,7 +259,8 @@ class EncoderDecoder3D(Base3DSegmentor):
                 if replace:  # duplicate
                     point_idxs_repeat = point_idxs[torch.randint(
                         0, point_idxs.shape[0],
-                        size=(num_repeat, )).to(device)]
+                        size=(num_repeat, ),
+                        device=device)]
                 else:
                     point_idxs_repeat = point_idxs[torch.randperm(
                         point_idxs.shape[0])[:num_repeat]]

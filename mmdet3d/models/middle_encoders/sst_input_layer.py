@@ -137,7 +137,7 @@ class SSTInputLayer(nn.Module):
             if self.debug:
                 assert inner_win_inds.max() < max_tokens, f'Max inner inds({inner_win_inds.max()}) larger(equal) than {max_tokens}'
                 assert (flat2window_inds >= 0).all()
-                max_ind = flat2window_inds.max().item()
+                max_ind = flat2window_inds.max().detach()
                 assert  max_ind < num_windows * max_tokens, f'max_ind({max_ind}) larger than upper bound({num_windows * max_tokens})'
                 assert  max_ind >= (num_windows-1) * max_tokens, f'max_ind({max_ind}) less than lower bound({(num_windows-1) * max_tokens})'
 
@@ -188,7 +188,7 @@ class SSTInputLayer(nn.Module):
             assert (num_tokens_each_win > 0).all()
             random_win = unique_sort_inds[random.randint(0, len(unique_sort_inds)-1)]
             random_mask = win_inds == random_win
-            num_voxel_this_win = bincount[random_win].item()
+            num_voxel_this_win = bincount[random_win].detach()
             random_inner_inds = inner_inds_reorder[random_mask] 
 
             assert len(torch.unique(random_inner_inds)) == num_voxel_this_win
@@ -202,7 +202,7 @@ class SSTInputLayer(nn.Module):
         inner_inds = -torch.ones_like(win_inds)
         for ind in unique_win_inds:
             mask = win_inds == ind
-            num = mask.sum().item()
+            num = mask.sum().detach()
             inner_inds[mask] = torch.arange(num, dtype=win_inds.dtype, device=win_inds.device)
         assert (inner_inds >= 0).all()
         return inner_inds
@@ -340,7 +340,7 @@ class SSTInputLayer(nn.Module):
 
         unique_inds, _ = torch.sort(torch.unique(inds))
         num_valid_inds = len(unique_inds)
-        max_origin_inds = unique_inds.max().item()
+        max_origin_inds = unique_inds.max().detach()
         canvas = -torch.ones((max_origin_inds+1,), dtype=dtype, device=device)
         canvas[unique_inds] = torch.arange(num_valid_inds, dtype=dtype, device=device)
 

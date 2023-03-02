@@ -282,7 +282,7 @@ class SSTInputLayerV2(nn.Module):
     @torch.no_grad()
     def get_key_padding_mask(self, ind_dict):
         num_all_voxel = len(ind_dict['voxel_drop_level'])
-        key_padding = torch.ones((num_all_voxel, 1)).to(ind_dict['voxel_drop_level'].device).bool()
+        key_padding = torch.ones((num_all_voxel, 1), device=ind_dict['voxel_drop_level'].device, dtype=torch.bool)
 
         window_key_padding_dict = flat2window_v2(key_padding, ind_dict)
 
